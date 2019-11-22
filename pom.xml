@@ -59,12 +59,22 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <metrics.version>4.0.3</metrics.version>
-        <cdi.version>1.2</cdi.version>
+        <weld1.version>1.1.28.Final</weld1.version>
+        <weld2.version>2.4.3.Final</weld2.version>
+        <weld3.version>3.1.2.Final</weld3.version>
+        <cdi1.old.version>1.0-SP4</cdi1.old.version>
+        <cdi1.version>1.2</cdi1.version>
         <cdi2.version>2.0</cdi2.version>
+        <javaee6.cdi.version>${cdi1.old.version}</javaee6.cdi.version>
+        <javaee7.cdi.version>${cdi1.version}</javaee7.cdi.version>
+        <javaee8.cdi.version>${cdi2.version}</javaee8.cdi.version>
+        <javaee6.version>6.0</javaee6.version>
         <javaee7.version>7.0</javaee7.version>
         <javaee8.version>8.0</javaee8.version>
-        <weld.version>2.4.3.Final</weld.version>
-        <weld3.version>3.0.3.Final</weld3.version>
+        <javaee6.weld.version>${weld1.version}</javaee6.weld.version>
+        <javaee7.weld.version>${weld2.version}</javaee7.weld.version>
+        <javaee8.weld.version>${weld3.version}</javaee8.weld.version>
+        <javaee8.weld.servlet.version>2.4.8.Final</javaee8.weld.servlet.version>
         <owb.version>1.7.3</owb.version>
         <wildfly-10.version>10.1.0.Final</wildfly-10.version>
         <jetty.version>9.4.6.v20170531</jetty.version>
@@ -76,6 +86,7 @@
 
     <modules>
         <module>impl</module>
+        <module>impl-jee6</module>
         <module>envs</module>
     </modules>
 
@@ -233,7 +244,7 @@
             <dependency>
                 <groupId>javax.enterprise</groupId>
                 <artifactId>cdi-api</artifactId>
-                <version>${cdi.version}</version>
+                <version>${cdi2.version}</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -289,7 +300,7 @@
             <dependency>
                 <groupId>javax.servlet.jsp</groupId>
                 <artifactId>javax.servlet.jsp-api</artifactId>
-                <version>2.3.1</version>
+                <version>2.3.3</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -363,14 +374,14 @@
             <dependency>
                 <groupId>org.jboss.weld</groupId>
                 <artifactId>weld-core-impl</artifactId>
-                <version>${weld.version}</version>
+                <version>${javaee8.weld.version}</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.jboss.weld.servlet</groupId>
                 <artifactId>weld-servlet</artifactId>
-                <version>${weld.version}</version>
+                <version>${javaee8.weld.servlet.version}</version>
                 <scope>test</scope>
             </dependency>
 

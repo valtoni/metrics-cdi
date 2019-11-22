@@ -56,7 +56,7 @@
         </profile>
 
         <profile>
-            <id>weld-2.0</id>
+            <id>weld-3.0</id>
 
             <dependencies>
 

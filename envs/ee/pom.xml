@@ -89,7 +89,7 @@
         </profile>
 
         <profile>
-            <id>weld-2.0</id>
+            <id>javaee-8</id>
 
             <dependencies>
 
@@ -112,14 +112,14 @@
                 <dependency>
                     <groupId>org.jboss.weld</groupId>
                     <artifactId>weld-core-impl</artifactId>
-                    <version>${weld3.version}</version>
+                    <version>${javaee8.weld.version}</version>
                     <scope>test</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.jboss.weld.module</groupId>
                     <artifactId>weld-web</artifactId>
-                    <version>${weld3.version}</version>
+                    <version>${javaee8.weld.version}</version>
                     <scope>test</scope>
                 </dependency>
 
