@@ -29,12 +29,8 @@ import javax.enterprise.inject.spi.ProcessProducerField;
 import javax.enterprise.inject.spi.ProcessProducerMethod;
 
 import com.codahale.metrics.health.HealthCheck;
-import com.codahale.metrics.health.HealthCheckRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static io.astefanutti.metrics.cdi.CdiHelper.getReference;
-import static io.astefanutti.metrics.cdi.CdiHelper.hasInjectionPoints;
 
 public class HealthCheckExtension implements Extension {
 
@@ -62,40 +58,9 @@ public class HealthCheckExtension implements Extension {
 
     private void defaultHealthCheckRegistry(@Observes AfterBeanDiscovery abd, BeanManager manager) {
         logger.info("YYYYYYYYYYYYYYYYY 3");
-        if (manager.getBeans(HealthCheckRegistry.class).isEmpty())
-            abd.addBean(new SyntheticBean<HealthCheckRegistry>(manager, HealthCheckRegistry.class, "health-check-registry", "Default Health Check Registry Bean"));
     }
 
     private void configuration(@Observes AfterDeploymentValidation adv, BeanManager manager) {
         logger.info("YYYYYYYYYYYYYYYYY 4");
-        // Register detected HealthChecks
-        HealthCheckRegistry healthCheckRegistry = getReference(manager, HealthCheckRegistry.class);
-
-        // Produced Beans.
-        for (Map.Entry<Bean<?>, AnnotatedMember<?>> bean : healthChecks.entrySet()) {
-            // skip producer methods with injection points.
-            if (hasInjectionPoints(bean.getValue()))
-                continue;
-
-            String name = bean.getKey().getName();
-            if (name == null) {
-                name = bean.getKey().getBeanClass().getName() + "." + bean.getValue().getJavaMember().getName();
-            }
-            healthCheckRegistry.register(name, (HealthCheck) getReference(manager, bean.getValue().getBaseType(), bean.getKey()));
-        }
-
-        // Declarative Scoped Beans
-        for (Bean<?> bean : manager.getBeans(HealthCheck.class)) {
-            if (healthChecks.containsKey(bean))
-                continue;
-
-            String name = bean.getName();
-            if (name == null) {
-                name = bean.getBeanClass().getName();
-            }
-            healthCheckRegistry.register(name, (HealthCheck) manager.getReference(bean, bean.getBeanClass(), manager.createCreationalContext(bean)));
-        }
-        // Clear out collected health check producers
-        healthChecks.clear();
     }
 }

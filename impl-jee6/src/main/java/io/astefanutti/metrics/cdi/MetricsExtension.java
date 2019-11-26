@@ -16,8 +16,6 @@
 package io.astefanutti.metrics.cdi;
 
 import com.codahale.metrics.Metric;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.annotation.CachedGauge;
 import com.codahale.metrics.annotation.Counted;
 import com.codahale.metrics.annotation.ExceptionMetered;
@@ -40,24 +38,14 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessProducerField;
 import javax.enterprise.inject.spi.ProcessProducerMethod;
 import javax.enterprise.util.AnnotationLiteral;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-
-import static io.astefanutti.metrics.cdi.CdiHelper.declareAsInterceptorBinding;
-import static io.astefanutti.metrics.cdi.CdiHelper.getReference;
-import static io.astefanutti.metrics.cdi.CdiHelper.hasInjectionPoints;
 
 public class MetricsExtension implements Extension {
-
-    private static final AnnotationLiteral<MetricsBinding> METRICS_BINDING = new AnnotationLiteral<MetricsBinding>(){};
 
     private static final AnnotationLiteral<Default> DEFAULT = new AnnotationLiteral<Default>(){};
 
     private final Map<Bean<?>, AnnotatedMember<?>> metrics = new HashMap<>();
-
-    private final MetricsConfigurationEvent configuration = new MetricsConfigurationEvent();
 
     private static Logger logger = LoggerFactory.getLogger(MetricsExtension.class);
 
@@ -69,18 +57,8 @@ public class MetricsExtension implements Extension {
         logger.info("XXXXXXX 0-1");
     }
 
-    @SuppressWarnings("unchecked")
-    <T> Optional<T> getParameter(MetricsParameter parameter) {
-        logger.info("XXXXXXX 1");
-        return (Optional<T>) Optional.ofNullable(configuration.getParameters().get(parameter));
-    }
-
     private void addInterceptorBindings(@Observes BeforeBeanDiscovery bbd, BeanManager manager) {
         logger.info("XXXXXXX 2");
-        declareAsInterceptorBinding(Counted.class, manager, bbd);
-        declareAsInterceptorBinding(ExceptionMetered.class, manager, bbd);
-        declareAsInterceptorBinding(Metered.class, manager, bbd);
-        declareAsInterceptorBinding(Timed.class, manager, bbd);
     }
 
     private Class[] targetAnnotations = new Class[] {
@@ -89,51 +67,21 @@ public class MetricsExtension implements Extension {
 
     private <X> void metricsAnnotations(@Observes ProcessAnnotatedType<X> pat) {
         logger.info("XXXXXXX 3");
-        Class<X> type = pat.getAnnotatedType().getJavaClass();
-        if (Arrays.asList(targetAnnotations).contains(type)) {
-            pat.setAnnotatedType(new AnnotatedTypeDecorator<>(pat.getAnnotatedType(), METRICS_BINDING));
-        }
     }
 
     private void metricProducerField(@Observes ProcessProducerField<? extends Metric, ?> ppf) {
         logger.info("XXXXXXX 4");
-        metrics.put(ppf.getBean(), ppf.getAnnotatedProducerField());
     }
 
     private void metricProducerMethod(@Observes ProcessProducerMethod<? extends Metric, ?> ppm) {
         logger.info("XXXXXXX 5");
-        // Skip the Metrics CDI alternatives
-        if (!ppm.getBean().getBeanClass().equals(MetricProducer.class))
-            metrics.put(ppm.getBean(), ppm.getAnnotatedProducerMethod());
     }
 
     private void defaultMetricRegistry(@Observes AfterBeanDiscovery abd, BeanManager manager) {
         logger.info("XXXXXXX 6");
-        if (manager.getBeans(MetricRegistry.class).isEmpty())
-            abd.addBean(new SyntheticBean<>(manager, MetricRegistry.class, "metric-registry", "Default Metric Registry Bean"));
     }
 
     private void configuration(@Observes AfterDeploymentValidation adv, BeanManager manager) {
         logger.info("XXXXXXX 7");
-        // Fire configuration event
-        manager.fireEvent(configuration);
-        configuration.unmodifiable();
-
-        // Produce and register custom metrics
-        MetricRegistry registry = getReference(manager, MetricRegistry.class);
-        MetricName metricName = getReference(manager, MetricName.class);
-        for (Map.Entry<Bean<?>, AnnotatedMember<?>> bean : metrics.entrySet()) {
-            // TODO: add MetricSet metrics into the metric registry
-            if (bean.getKey().getTypes().contains(MetricSet.class)
-                // skip non @Default beans
-                || !bean.getKey().getQualifiers().contains(DEFAULT)
-                // skip producer methods with injection point
-                || hasInjectionPoints(bean.getValue()))
-                continue;
-            registry.register(metricName.of(bean.getValue()), getReference(manager, bean.getValue().getBaseType(), bean.getKey()));
-        }
-
-        // Let's clear the collected metric producers
-        metrics.clear();
     }
 }
