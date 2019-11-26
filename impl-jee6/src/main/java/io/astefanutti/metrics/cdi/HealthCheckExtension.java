@@ -30,28 +30,44 @@ import javax.enterprise.inject.spi.ProcessProducerMethod;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.astefanutti.metrics.cdi.CdiHelper.getReference;
 import static io.astefanutti.metrics.cdi.CdiHelper.hasInjectionPoints;
 
 public class HealthCheckExtension implements Extension {
 
+    private static Logger logger = LoggerFactory.getLogger(HealthCheckExtension.class);
+
+    static {
+        logger.info("YYYYYYYYYYYYYYYYY 0");
+    }
+
+    public HealthCheckExtension() {
+        logger.info("YYYYYYYYYYYYYYYYY 0-1");
+    }
+
     private final Map<Bean<?>, AnnotatedMember<?>> healthChecks = new HashMap<>();
 
     private void healthCheckProducerField(@Observes ProcessProducerField<? extends HealthCheck, ?> ppf) {
+        logger.info("YYYYYYYYYYYYYYYYY 1");
         healthChecks.put(ppf.getBean(), ppf.getAnnotatedProducerField());
     }
 
     private void healthCheckProducerMethod(@Observes ProcessProducerMethod<? extends HealthCheck, ?> ppm) {
+        logger.info("YYYYYYYYYYYYYYYYY 2");
         healthChecks.put(ppm.getBean(), ppm.getAnnotatedProducerMethod());
     }
 
     private void defaultHealthCheckRegistry(@Observes AfterBeanDiscovery abd, BeanManager manager) {
+        logger.info("YYYYYYYYYYYYYYYYY 3");
         if (manager.getBeans(HealthCheckRegistry.class).isEmpty())
             abd.addBean(new SyntheticBean<HealthCheckRegistry>(manager, HealthCheckRegistry.class, "health-check-registry", "Default Health Check Registry Bean"));
     }
 
     private void configuration(@Observes AfterDeploymentValidation adv, BeanManager manager) {
+        logger.info("YYYYYYYYYYYYYYYYY 4");
         // Register detected HealthChecks
         HealthCheckRegistry healthCheckRegistry = getReference(manager, HealthCheckRegistry.class);
 

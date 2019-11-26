@@ -24,6 +24,8 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Gauge;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Default;
@@ -57,12 +59,24 @@ public class MetricsExtension implements Extension {
 
     private final MetricsConfigurationEvent configuration = new MetricsConfigurationEvent();
 
+    private static Logger logger = LoggerFactory.getLogger(MetricsExtension.class);
+
+    static {
+        logger.info("XXXXXXX 0");
+    }
+
+    public MetricsExtension() {
+        logger.info("XXXXXXX 0-1");
+    }
+
     @SuppressWarnings("unchecked")
     <T> Optional<T> getParameter(MetricsParameter parameter) {
+        logger.info("XXXXXXX 1");
         return (Optional<T>) Optional.ofNullable(configuration.getParameters().get(parameter));
     }
 
     private void addInterceptorBindings(@Observes BeforeBeanDiscovery bbd, BeanManager manager) {
+        logger.info("XXXXXXX 2");
         declareAsInterceptorBinding(Counted.class, manager, bbd);
         declareAsInterceptorBinding(ExceptionMetered.class, manager, bbd);
         declareAsInterceptorBinding(Metered.class, manager, bbd);
@@ -74,6 +88,7 @@ public class MetricsExtension implements Extension {
     };
 
     private <X> void metricsAnnotations(@Observes ProcessAnnotatedType<X> pat) {
+        logger.info("XXXXXXX 3");
         Class<X> type = pat.getAnnotatedType().getJavaClass();
         if (Arrays.asList(targetAnnotations).contains(type)) {
             pat.setAnnotatedType(new AnnotatedTypeDecorator<>(pat.getAnnotatedType(), METRICS_BINDING));
@@ -81,21 +96,25 @@ public class MetricsExtension implements Extension {
     }
 
     private void metricProducerField(@Observes ProcessProducerField<? extends Metric, ?> ppf) {
+        logger.info("XXXXXXX 4");
         metrics.put(ppf.getBean(), ppf.getAnnotatedProducerField());
     }
 
     private void metricProducerMethod(@Observes ProcessProducerMethod<? extends Metric, ?> ppm) {
+        logger.info("XXXXXXX 5");
         // Skip the Metrics CDI alternatives
         if (!ppm.getBean().getBeanClass().equals(MetricProducer.class))
             metrics.put(ppm.getBean(), ppm.getAnnotatedProducerMethod());
     }
 
     private void defaultMetricRegistry(@Observes AfterBeanDiscovery abd, BeanManager manager) {
+        logger.info("XXXXXXX 6");
         if (manager.getBeans(MetricRegistry.class).isEmpty())
             abd.addBean(new SyntheticBean<>(manager, MetricRegistry.class, "metric-registry", "Default Metric Registry Bean"));
     }
 
     private void configuration(@Observes AfterDeploymentValidation adv, BeanManager manager) {
+        logger.info("XXXXXXX 7");
         // Fire configuration event
         manager.fireEvent(configuration);
         configuration.unmodifiable();
