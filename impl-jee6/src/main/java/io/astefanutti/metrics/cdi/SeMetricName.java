@@ -18,7 +18,6 @@ package io.astefanutti.metrics.cdi;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Metric;
 
-import javax.enterprise.inject.Vetoed;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.AnnotatedMember;
 import javax.enterprise.inject.spi.AnnotatedParameter;
@@ -28,7 +27,6 @@ import java.lang.reflect.Parameter;
 
 import static io.astefanutti.metrics.cdi.MetricsParameter.UseAbsoluteName;
 
-@Vetoed
 /* package-private */ class SeMetricName implements MetricName {
 
     private final MetricsExtension extension;

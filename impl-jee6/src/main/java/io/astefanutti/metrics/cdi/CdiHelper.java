@@ -20,7 +20,6 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.enterprise.inject.Vetoed;
 import javax.enterprise.inject.spi.AnnotatedMember;
 import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedParameter;
@@ -33,7 +32,6 @@ import javax.enterprise.util.AnnotationLiteral;
 import javax.enterprise.util.Nonbinding;
 import javax.interceptor.InterceptorBinding;
 
-@Vetoed
 final class CdiHelper {
 
     private static final AnnotationLiteral<Nonbinding> NON_BINDING = new AnnotationLiteral<Nonbinding>(){};
@@ -41,12 +39,16 @@ final class CdiHelper {
     private static final AnnotationLiteral<InterceptorBinding> INTERCEPTOR_BINDING = new AnnotationLiteral<InterceptorBinding>(){};
 
     static <T extends Annotation> void declareAsInterceptorBinding(Class<T> annotation, BeanManager manager, BeforeBeanDiscovery bbd) {
+        /*************** dead code ***************************/
         AnnotatedType<T> annotated = manager.createAnnotatedType(annotation);
         Set<AnnotatedMethod<? super T>> methods = new HashSet<>();
         for (AnnotatedMethod<? super T> method : annotated.getMethods())
             methods.add(new AnnotatedMethodDecorator<>(method, NON_BINDING));
 
-        bbd.addInterceptorBinding(new AnnotatedTypeDecorator<>(annotated, INTERCEPTOR_BINDING, methods));
+        AnnotatedTypeDecorator annotatedTypeDecorator = new AnnotatedTypeDecorator<>(annotated, INTERCEPTOR_BINDING, methods);
+        /*************** dead code ***************************/
+
+        bbd.addInterceptorBinding(annotation);
     }
 
     static <T> T getReference(BeanManager manager, Class<T> type) {

@@ -57,6 +57,13 @@
         <!-- provided dependencies -->
 
         <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-core</artifactId>
+            <version>${javaee6.weld.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <version>${javaee6.cdi.version}</version>

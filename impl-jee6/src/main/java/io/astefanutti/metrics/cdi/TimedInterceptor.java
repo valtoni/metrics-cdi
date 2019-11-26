@@ -20,10 +20,8 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.Timed;
 
 import javax.annotation.Priority;
-import javax.enterprise.inject.Intercepted;
 import javax.enterprise.inject.spi.Bean;
 import javax.inject.Inject;
-import javax.interceptor.AroundConstruct;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
@@ -32,7 +30,7 @@ import javax.interceptor.AroundTimeout;
 
 @Timed
 @Interceptor
-@Priority(Interceptor.Priority.LIBRARY_BEFORE  + 10)
+@Priority(InterceptorPriority.LIBRARY_BEFORE  + 10)
 /* package-private */ class TimedInterceptor {
 
     private final Bean<?> bean;
@@ -42,16 +40,16 @@ import javax.interceptor.AroundTimeout;
     private final MetricResolver resolver;
 
     @Inject
-    private TimedInterceptor(@Intercepted Bean<?> bean, MetricRegistry registry, MetricResolver resolver) {
+    private TimedInterceptor(Bean<?> bean, MetricRegistry registry, MetricResolver resolver) {
         this.bean = bean;
         this.registry = registry;
         this.resolver = resolver;
     }
 
-    @AroundConstruct
+/*    @AroundConstruct
     private Object timedConstructor(InvocationContext context) throws Exception {
         return timedCallable(context, context.getConstructor());
-    }
+    }*/
 
     @AroundInvoke
     private Object timedMethod(InvocationContext context) throws Exception {

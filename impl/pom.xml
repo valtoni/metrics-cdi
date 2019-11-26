@@ -79,6 +79,13 @@
             <artifactId>java-hamcrest</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-core-impl</artifactId>
+            <version>${javaee7.weld.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

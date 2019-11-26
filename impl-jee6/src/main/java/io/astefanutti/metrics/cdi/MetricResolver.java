@@ -24,7 +24,6 @@ import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Vetoed;
 import javax.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -193,7 +192,6 @@ import static io.astefanutti.metrics.cdi.MetricsParameter.UseAbsoluteName;;;
         }
     }
 
-    @Vetoed
     public static final class DoesNotHaveMetric<T extends Annotation> implements Of<T> {
 
         private DoesNotHaveMetric() {
